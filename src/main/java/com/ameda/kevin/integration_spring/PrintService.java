@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 
 public class PrintService {
 
-    void print(Message<String> message){
+    public void print(Message<String> message){
         MessageHeaders headers = message.getHeaders();
         for(Entry<String,Object> entry: headers.entrySet()){
             System.out.println(entry.getKey());

@@ -6,5 +6,9 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
-    <int:channel id="messageChannel" />
+    <int:channel id="inputChannel" />
+
+    <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
+    <int:service-activator ref="printService" method="print" input-channel="inputChannel">
+    </int:service-activator>
 </beans>
