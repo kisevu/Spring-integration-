@@ -22,6 +22,8 @@ public class PrintService {
             System.out.println(entry.getValue());
         }
         System.out.println(message.getPayload());
-        return MessageBuilder.withPayload("returned message").build();
+        return MessageBuilder
+                .withPayload("final message returned from the channel")
+                .build();
     }
 }

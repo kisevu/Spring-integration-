@@ -8,9 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
 
 
@@ -18,15 +17,14 @@ import org.springframework.messaging.support.MessageBuilder;
 @Configuration
 @ImportResource("integration-context.xml")
 public class IntegrationSpringApplication implements ApplicationRunner {
-	//channels are important because they decouple endpoints that exchange
-	// messages
+	// MessagingTemplate reduce on the boilerplate code
+	// it provides for the requests and replies
+	//Also xml configuration, we do not need to provide the output channel same
+	//way we did to the input channel
+	//also we do not need to provide output channel to the service activator endpoint
 	@Autowired
 	@Qualifier("inputChannel")
 	private DirectChannel inputChannel;
-
-	@Autowired
-	@Qualifier("outputChannel")
-	private DirectChannel outputChannel;
 
 
 	public static void main(String[] args) {
@@ -35,21 +33,13 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		outputChannel.subscribe(new MessageHandler() {
-			@Override
-			public void handleMessage(Message<?> message) throws MessagingException {
-				System.out.println(message.getPayload());
-			}
-		});
-
 		Message<String> message = MessageBuilder
 				.withPayload("Hello kev from builder pattern")
 				.setHeader("key","value")
 				.build();
-		inputChannel.send(message);
+		MessagingTemplate template = new MessagingTemplate();
+		Message<?> resultMessage = template.sendAndReceive(inputChannel, message);
+		System.out.println(resultMessage.getPayload());
 	}
-
-	//included a single endpoint as (service-activator) to complete the
-	// entire flow
 
 }
