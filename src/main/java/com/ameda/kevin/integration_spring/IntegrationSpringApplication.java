@@ -7,11 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.support.MessageBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @SpringBootApplication
 @Configuration
@@ -24,10 +22,11 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		Map<String,Object> map = new HashMap<>();
-		map.put("author","kevin");
-		MessageHeaders headers = new MessageHeaders(map);
-		Message<String> message = new GenericMessage("Kevin Ameda Kisevu",headers);
+		//a modern way of working with the builder...
+		Message<String> message = MessageBuilder
+				.withPayload("Hello kev from builder pattern")
+				.setHeader("header1","header1")
+				.build();
 		PrintService printService = new PrintService();
 		printService.print(message);
 	}
