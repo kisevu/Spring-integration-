@@ -1,5 +1,6 @@
 package com.ameda.kevin.integration_spring;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +21,12 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 	//channels are important because they decouple endpoints that exchange
 	// messages
 	@Autowired
-	private DirectChannel channel;
+	@Qualifier("inputChannel")
+	private DirectChannel inputChannel;
+
+	@Autowired
+	@Qualifier("outputChannel")
+	private DirectChannel outputChannel;
 
 
 	public static void main(String[] args) {
@@ -29,19 +35,18 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-//		channel.subscribe(new MessageHandler() {
-//
-//			@Override
-//			public void handleMessage(Message<?> message) throws MessagingException {
-//				new PrintService().print((Message<String>) message);
-//			}
-//		});
+		outputChannel.subscribe(new MessageHandler() {
+			@Override
+			public void handleMessage(Message<?> message) throws MessagingException {
+				System.out.println(message.getPayload());
+			}
+		});
 
 		Message<String> message = MessageBuilder
 				.withPayload("Hello kev from builder pattern")
 				.setHeader("key","value")
 				.build();
-		channel.send(message);
+		inputChannel.send(message);
 	}
 
 	//included a single endpoint as (service-activator) to complete the
