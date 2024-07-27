@@ -36,6 +36,11 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 		}
 	}
 
+
+
+
+
+
 	/*
 	*  	QueueChannel uses the FIFO ordering.
 	* 	PriorityQueueChannel orders by priority.
