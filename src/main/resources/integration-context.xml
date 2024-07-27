@@ -9,8 +9,10 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
     default-request-channel="inputChannel"></int:gateway>
 
+    <bean id="customComparator" class="com.ameda.kevin.integration_spring.CustomMessageComparator" />
+
     <int:channel id="inputChannel">
-        <int:priority-queue capacity="10"/>
+        <int:priority-queue capacity="10" comparator="customComparator"/>
     </int:channel>
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
@@ -19,7 +21,7 @@
             ref="printService"
             method="print"
             input-channel="inputChannel">
-        <int:poller fixed-rate="5" time-unit="SECONDS" max-messages-per-poll="2"/>
+        <int:poller fixed-rate="10" time-unit="SECONDS" max-messages-per-poll="2"/>
     </int:service-activator>
 </beans>
 
