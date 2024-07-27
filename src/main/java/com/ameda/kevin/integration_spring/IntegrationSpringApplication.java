@@ -10,10 +10,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 
 @SpringBootApplication
@@ -31,28 +28,20 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws InterruptedException,ExecutionException {
-		List<Future<Message<String>>> futures = new ArrayList<>();
-
-		for(int x=0; x<10;x++){
+		for(int x =0; x < 10; x++){
 			Message<String> message = MessageBuilder
-					.withPayload("Printing message payload for : "+ x)
-					.setHeader("messageNumber",x)
-					.setHeader("priority",x)
+					.withPayload("printing message payload for: "+ x)
 					.build();
-			System.out.println("printing sending message: "+ x);
-			futures.add(this.gateway.print(message));
-			//passing message to our queue channel
-		}
-
-		for(Future<Message<String>> future: futures){
-			System.out.println(future.get().getPayload());
+			this.gateway.print(message);
 		}
 	}
 
 	/*
-	*  	QueueChannel uses the FIFO ordering
-	* 	PriorityQueueChannel orders by priority
-	*
+	*  	QueueChannel uses the FIFO ordering.
+	* 	PriorityQueueChannel orders by priority.
+	*   DirectChannel implements the SubscribableChannel interface and make use of RoundRobin Loadbalancer that
+	*   will alternate between message handlers when sending messages.
+	*   DirectChannel is unique it only delivers a message to a single subscribed message handler.
 	*
 	* */
 

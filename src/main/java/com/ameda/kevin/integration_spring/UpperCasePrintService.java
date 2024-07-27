@@ -10,9 +10,9 @@ package com.ameda.kevin.integration_spring;
 
 import org.springframework.messaging.Message;
 
-public class PrintService {
+public class UpperCasePrintService {
 
     public void print(Message<String> message){
-        System.out.println(message.getPayload());
+        System.out.println(message.getPayload().toUpperCase());
     }
 }

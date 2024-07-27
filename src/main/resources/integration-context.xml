@@ -7,33 +7,28 @@
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
-    default-request-channel="inputChannel"></int:gateway>
+                 default-request-channel="inputChannel">
+    </int:gateway>
 
-    <bean id="customComparator" class="com.ameda.kevin.integration_spring.CustomMessageComparator" />
-
-    <int:channel id="inputChannel">
-        <int:priority-queue capacity="10" comparator="customComparator"/>
-    </int:channel>
+    <int:channel id="inputChannel"> </int:channel>
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
+    <bean class="com.ameda.kevin.integration_spring.UpperCasePrintService" id="upperCasePrintService"/>
 
-    <int:service-activator
-            ref="printService"
-            method="print"
-            input-channel="inputChannel">
-        <int:poller fixed-rate="10" time-unit="SECONDS" max-messages-per-poll="2"/>
+    <int:service-activator ref="printService" method="print" input-channel="inputChannel">
+    </int:service-activator>
+
+    <int:service-activator ref="upperCasePrintService" method="print" input-channel="inputChannel">
     </int:service-activator>
 </beans>
 
 <!--
-our request received on gateway will be sent to inputChannel
-inputChannel delivers messages to our service-activator which is exposing our
-PrintService
-We've placed a capacity for the inputChannel queue
-service-activator is the one reading messages off the queue and with it
-it has a poller that determines the frequency of how messages are pulled off the queue,
-and above we've made that to be after 5 seconds and we're going to pull a max of 2 messages per 5 seconds
-QueueChannel, places each message within a blocking queue that can be pulled by endpoints that invoke the channel's receive
-method. Allows messages to be handled asynchronously. Execution of our application does not stop await for a response
-from a consumer.
+ * Detail break down of the entire architecture
+ ***************************************************
+ * PrintService class contains the print() which receives the message
+ * from the service activator which is connected to the messaging architecture
+ * by DirectChannel
+ * So we need demonstrating the load balancing capabilities of DirectChannel  we need creating another endpoint
+ * called UpperCasePrintService which displays the wordings in uppercase in order to see our experiment
 -->
+
