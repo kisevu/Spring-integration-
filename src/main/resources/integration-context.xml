@@ -15,10 +15,10 @@
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
     <bean class="com.ameda.kevin.integration_spring.UpperCasePrintService" id="upperCasePrintService"/>
 
-    <int:service-activator ref="printService" method="print" input-channel="inputChannel">
+    <int:service-activator order="1" ref="printService" method="print" input-channel="inputChannel">
     </int:service-activator>
 
-    <int:service-activator ref="upperCasePrintService" method="print" input-channel="inputChannel">
+    <int:service-activator  order="2" ref="upperCasePrintService" method="print" input-channel="inputChannel">
     </int:service-activator>
 </beans>
 
