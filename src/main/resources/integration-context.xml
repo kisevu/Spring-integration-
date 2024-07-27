@@ -31,4 +31,7 @@ We've placed a capacity for the inputChannel queue
 service-activator is the one reading messages off the queue and with it
 it has a poller that determines the frequency of how messages are pulled off the queue,
 and above we've made that to be after 5 seconds and we're going to pull a max of 2 messages per 5 seconds
+QueueChannel, places each message within a blocking queue that can be pulled by endpoints that invoke the channel's receive
+method. Allows messages to be handled asynchronously. Execution of our application does not stop await for a response
+from a consumer.
 -->

@@ -7,7 +7,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -24,6 +23,8 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Autowired
 	private PrinterGateway gateway;
+
+
 	public static void main(String[] args) {
 		SpringApplication.run(IntegrationSpringApplication.class, args);
 	}
@@ -34,11 +35,12 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 		for(int x=0; x<10;x++){
 			Message<String> message = MessageBuilder
-					.withPayload("Printing message: "+ x)
+					.withPayload("Printing message payload for : "+ x)
 					.setHeader("messageNumber",x)
 					.build();
-			System.out.println("sending message: "+ x);
+			System.out.println("printing sending message: "+ x);
 			futures.add(this.gateway.print(message));
+			//passing message to our queue channel
 		}
 
 		for(Future<Message<String>> future: futures){
