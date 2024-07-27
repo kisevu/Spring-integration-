@@ -37,6 +37,7 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 			Message<String> message = MessageBuilder
 					.withPayload("Printing message payload for : "+ x)
 					.setHeader("messageNumber",x)
+					.setHeader("priority",x)
 					.build();
 			System.out.println("printing sending message: "+ x);
 			futures.add(this.gateway.print(message));
@@ -47,6 +48,13 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 			System.out.println(future.get().getPayload());
 		}
 	}
+
+	/*
+	*  	QueueChannel uses the FIFO ordering
+	* 	PriorityQueueChannel orders by priority
+	*
+	*
+	* */
 
 
 
