@@ -14,10 +14,12 @@
 
     <int:channel id="pollableChannel">
         <int:queue capacity="10" />
+        <int:interceptors>
+            <int:ref bean="interceptor"/>
+        </int:interceptors>
     </int:channel>
 
     <int:publish-subscribe-channel id="inputChannel" task-executor="executor"/>
-
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="pollableChannel"/>
 
@@ -29,18 +31,15 @@
     <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
     <bean id="upperCasePrintService" class="com.ameda.kevin.integration_spring.UpperCasePrintService" />
 
+    <bean id="interceptor" class="com.ameda.kevin.integration_spring.CustomChannelInterceptor" />
+
     <int:service-activator ref="upperCasePrintService" method="print" input-channel="inputChannel"/>
     <int:service-activator ref="printService" method="print" input-channel="inputChannel"/>
 </beans>
 
 <!--
-* A messaging bridge is used to connect two channel implementations
-* a better use case is connecting a Pollable channel to a subscribable channel
-* this allows to hide polling configurations from multiple endpoints
-* in the above we've interjected our bridge between Pollable channel and the Publish subscribe channel.
-* all of our the messages will build up on the queue, a poller will pull 2 messages every 5 seconds
- and send them to the publish subscribe channel which will then send them to both of our print services.
-* The approach is meaningful because we are able to queue up our messages on the Pollable channel. It helps
- to throttle how we would send our messages to the endpoints that are subscribed to the publish subscribe channel
- which is made possible by the bridge
+* Spring integration provides the ChannelInterceptor bean that is used to respond
+when messages are sent or received from a channel.
+* When an interceptor is used in a channel then it means that we have a hook into the messaging architecture which
+can bear benefits. The benefits can be logging, or message modifications at a global level
  -->
