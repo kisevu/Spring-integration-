@@ -6,12 +6,29 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
-    <int:channel id="inputChannel" />
+    <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
+    default-request-channel="inputChannel"></int:gateway>
+
+    <int:channel id="inputChannel">
+        <int:queue capacity="10"/>
+    </int:channel>
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
+
     <int:service-activator
             ref="printService"
             method="print"
             input-channel="inputChannel">
+        <int:poller fixed-rate="5" time-unit="SECONDS" max-messages-per-poll="2"/>
     </int:service-activator>
 </beans>
+
+<!--
+our request received on gateway will be sent to inputChannel
+inputChannel delivers messages to our service-activator which is exposing our
+PrintService
+We've placed a capacity for the inputChannel queue
+service-activator is the one reading messages off the queue and with it
+it has a poller that determines the frequency of how messages are pulled off the queue,
+and above we've made that to be after 5 seconds and we're going to pull a max of 2 messages per 5 seconds
+-->

@@ -1,46 +1,60 @@
 package com.ameda.kevin.integration_spring;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 @SpringBootApplication
 @Configuration
 @ImportResource("integration-context.xml")
 public class IntegrationSpringApplication implements ApplicationRunner {
-	// MessagingTemplate reduce on the boilerplate code
-	// it provides for the requests and replies
-	//Also xml configuration, we do not need to provide the output channel same
-	//way we did to the input channel
-	//also we do not need to provide output channel to the service activator endpoint
+
 	@Autowired
-	@Qualifier("inputChannel")
-	private DirectChannel inputChannel;
-
-
+	private PrinterGateway gateway;
 	public static void main(String[] args) {
 		SpringApplication.run(IntegrationSpringApplication.class, args);
 	}
 
 	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		Message<String> message = MessageBuilder
-				.withPayload("Hello kev from builder pattern")
-				.setHeader("key","value")
-				.build();
-		MessagingTemplate template = new MessagingTemplate();
-		Message<?> resultMessage = template.sendAndReceive(inputChannel, message);
-		System.out.println(resultMessage.getPayload());
+	public void run(ApplicationArguments args) throws InterruptedException,ExecutionException {
+		List<Future<Message<String>>> futures = new ArrayList<>();
+
+		for(int x=0; x<10;x++){
+			Message<String> message = MessageBuilder
+					.withPayload("Printing message: "+ x)
+					.setHeader("messageNumber",x)
+					.build();
+			System.out.println("sending message: "+ x);
+			futures.add(this.gateway.print(message));
+		}
+
+		for(Future<Message<String>> future: futures){
+			System.out.println(future.get().getPayload());
+		}
 	}
+
+
+
+
+
+
+
+
+
+
 	// Channels are used to pass messages between endpoints.
 	// Different channel implementations and components
 	// Some messages might need to be sent to multiple endpoints or a single endpoint
