@@ -2,37 +2,27 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/integration
-                           http://www.springframework.org/schema/integration/spring-integration.xsd">
+                           http://www.springframework.org/schema/integration/spring-integration.xsd
+                           http://www.springframework.org/schema/task
+                           http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+    <task:executor id="executor" pool-size="5" />
+
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel">
-
     </int:gateway>
 
-    <int:publish-subscribe-channel id="inputChannel" ignore-failures="false"> </int:publish-subscribe-channel>
+    <int:publish-subscribe-channel id="inputChannel" ignore-failures="false" task-executor="executor">
+    </int:publish-subscribe-channel>
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
     <bean class="com.ameda.kevin.integration_spring.UpperCasePrintService" id="upperCasePrintService"/>
 
-    <int:service-activator order="1" ref="printService" method="print" input-channel="inputChannel">
-    </int:service-activator>
-
-    <int:service-activator  order="2" ref="upperCasePrintService" method="print" input-channel="inputChannel">
-    </int:service-activator>
+    <int:service-activator order="1" ref="printService" method="print" input-channel="inputChannel"/>
+    <int:service-activator order="2" ref="upperCasePrintService" method="print" input-channel="inputChannel"/>
 </beans>
-
-<!--
- * Detail break down of PublishSubscribeChannel
- ***************************************************
- * Primarily used for sending messages to zero, one or many endpoints
- * The messages sent serves as notifications to all subscribed message  of a particular event
- * With the default-request-channel we are going to remove the usage of the DirectChannel that it exhibits
- * We are going to use a publish subscribe channel for this usage
- * Now above we have multiple endpoints subscribed to our channel, unlike the DirectChannel that would send a message
- * to one service activator, the publish subscribe channel will notify both of this endpoints because they have
- * subscribed to the input channel
- * Now 20 messages are printed to the console
--->
-
