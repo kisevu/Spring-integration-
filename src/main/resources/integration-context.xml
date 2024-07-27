@@ -10,19 +10,37 @@
                            http://www.springframework.org/schema/task
                            http://www.springframework.org/schema/task/spring-task.xsd">
 
-
     <task:executor id="executor" pool-size="5" />
 
+    <int:channel id="pollableChannel">
+        <int:queue capacity="10" />
+    </int:channel>
+
+    <int:publish-subscribe-channel id="inputChannel" task-executor="executor"/>
+
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
-                 default-request-channel="inputChannel">
-    </int:gateway>
+                 default-request-channel="pollableChannel"/>
 
-    <int:publish-subscribe-channel id="inputChannel" ignore-failures="false" task-executor="executor">
-    </int:publish-subscribe-channel>
+    <int:bridge input-channel="pollableChannel" output-channel="inputChannel">
+        <int:poller fixed-delay="5" time-unit="SECONDS" max-messages-per-poll="2">
+        </int:poller>
+    </int:bridge>
 
-    <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
-    <bean class="com.ameda.kevin.integration_spring.UpperCasePrintService" id="upperCasePrintService"/>
+    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
+    <bean id="upperCasePrintService" class="com.ameda.kevin.integration_spring.UpperCasePrintService" />
 
-    <int:service-activator order="1" ref="printService" method="print" input-channel="inputChannel"/>
-    <int:service-activator order="2" ref="upperCasePrintService" method="print" input-channel="inputChannel"/>
+    <int:service-activator ref="upperCasePrintService" method="print" input-channel="inputChannel"/>
+    <int:service-activator ref="printService" method="print" input-channel="inputChannel"/>
 </beans>
+
+<!--
+* A messaging bridge is used to connect two channel implementations
+* a better use case is connecting a Pollable channel to a subscribable channel
+* this allows to hide polling configurations from multiple endpoints
+* in the above we've interjected our bridge between Pollable channel and the Publish subscribe channel.
+* all of our the messages will build up on the queue, a poller will pull 2 messages every 5 seconds
+ and send them to the publish subscribe channel which will then send them to both of our print services.
+* The approach is meaningful because we are able to queue up our messages on the Pollable channel. It helps
+ to throttle how we would send our messages to the endpoints that are subscribed to the publish subscribe channel
+ which is made possible by the bridge
+ -->
