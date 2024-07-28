@@ -17,25 +17,33 @@
             channel="inboundChannel"
             filename-pattern="sample.txt">
 
-        <int:poller fixed-rate="10000"/>
+        <int:poller fixed-rate="10000" time-unit="SECONDS"/>
     </int-file:inbound-channel-adapter>
 
     <int:channel id="inboundChannel"/>
+    <int:channel id="transformChannel"/>
 
-    <int-file:outbound-channel-adapter
-            directory="file:src/test/write"
-            channel="inboundChannel"
-            auto-create-directory="true"
-            mode="REPLACE"
-            delete-source-files="true">
-    </int-file:outbound-channel-adapter>
+    <int-file:file-to-string-transformer input-channel="inboundChannel" output-channel="transformChannel"/>
+    <bean id="filePrinter" class="com.ameda.kevin.integration_spring.FilePrinter"/>
+    <int:service-activator ref="filePrinter" input-channel="transformChannel" method="print"/>
+
+
+<!--    <int-file:outbound-channel-adapter-->
+<!--            directory="file:src/test/write"-->
+<!--            channel="inboundChannel"-->
+<!--            auto-create-directory="true"-->
+<!--            mode="REPLACE"-->
+<!--            delete-source-files="true">-->
+<!--    </int-file:outbound-channel-adapter>-->
 </beans>
 
 <!--
-* Writing files to the file system using spring integration outbound channel adapter
-************************************************************************************
-* namespace provides a convenient approach to using file writing message handler to write to file system.
-* When working with the int-file outbound-channel adapter, it accepts messages that have a payload of type;
-a) file b)bytearray c) string
-* in our place we'll be working with the file for our example at the top
+* Transforming files
+*******************************************************
+* How to add a transformer from the file namespace to a message flow
+* Transformer will allow us to convert the payload of our message from a file to a string.
+* pick the file from the file system (inbound channel adapter), send it to the inbound channel
+ the inbound channel delivers it to the transformer, the transformer transforms the file to a string and
+ places it to the transformChannel and the channel drops it to the service activator which sends the message
+ to the FilePrinter  where the contents of the file will be printed.
 -->

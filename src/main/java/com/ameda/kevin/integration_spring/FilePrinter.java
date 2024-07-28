@@ -31,4 +31,9 @@ public class FilePrinter {
        }
     }
 
+    public void print(String file){
+        System.out.println("invoking print method with string.");
+        System.out.println(file);
+    }
+
 }
