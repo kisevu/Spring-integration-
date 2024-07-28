@@ -36,19 +36,18 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 		employees.add(new Employee(1,"judith",1000.00));
 
 
-		for(int x = 0; x< employees.size();++x){
-			Employee employee = employees.get(x);
-			Message<?> message = MessageBuilder
-					.withPayload(employee)
-//					.setHeader("routeHeader","objChannel")
-					.build();
-			this.gateway.print(message);
-		}
-//		for(int x = 0; x<employees.size(); x++){
+//		for(int x = 0; x< employees.size();++x){
+//			Employee employee = employees.get(x);
 //			Message<?> message = MessageBuilder
-//					.withPayload(x)
+//					.withPayload(employee)
 //					.build();
 //			this.gateway.print(message);
 //		}
+		for(int x = 0; x<employees.size(); x++){
+			Message<?> message = MessageBuilder
+					.withPayload("kev")
+					.build();
+			this.gateway.print(message);
+		}
 	}
 }

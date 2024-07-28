@@ -9,12 +9,8 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
-    <int:recipient-list-router input-channel="inputChannel" default-output-channel="defaultChannel">
-        <int:recipient selector-expression="payload.id == 1" channel="intChannel" />
-        <int:recipient selector-expression="payload.id == 2" channel="stringChannel" />
-        <int:recipient selector-expression="payload.id == 3" channel="objChannel" />
-    </int:recipient-list-router>
-
+  <bean class="com.ameda.kevin.integration_spring.CustomRouter" id="customRouter"/>
+  <int:router ref="customRouter" input-channel="inputChannel" default-output-channel="intChannel" />
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
     <bean class="com.ameda.kevin.integration_spring.NumericPrintService" id="numericPrintService"/>
@@ -28,12 +24,8 @@
 </beans>
 
 <!--
-* Recipient List Router
+* Custom message Router
 **************************
-* Allows to statically define a list of message channels that should receive a message passed to the router
-* At least all the channels received the message
-* We have an attribute selector-expression="payload.equals(Employee{id=1, name='judith', salary=1000.0})" and
- specify to which channel it should be routed to
-* I've set a default channel in case the selection-expression doesn't match to any channel
-*
+* Creating a custom message router and connecting it to the spring messaging architecture
+* CustomRouter class is defined and the logic placed into it to handle the custom nature of working
 -->
