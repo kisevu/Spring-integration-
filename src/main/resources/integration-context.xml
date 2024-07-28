@@ -12,7 +12,9 @@
     <int:channel id="inputChannel" />
     <int:channel id="outputChannel" />
 
-    <int:transformer expression="payload.toUpperCase()" input-channel="inputChannel" output-channel="outputChannel"/>
+    <bean id="CustomTransformer" class="com.ameda.kevin.integration_spring.CustomTransformer"/>
+
+    <int:transformer ref="CustomTransformer" method="transform" input-channel="inputChannel" output-channel="outputChannel"/>
 
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
@@ -28,4 +30,5 @@ consuming endpoint
 * i.e. if we had an endpoint processing only Json data, however, a producer sends objects. Transformer can be
 used to perform transformation from objects to json data
 * Transformers are used for standardizing data and passing them downstream
+*custom logic of transformation
 -->
