@@ -30,16 +30,11 @@
 </beans>
 
 <!--
-* Payload  Enricher
-**************************
-* used to append additional info to a message's payload.
-* Allows us to pass a message to a request channel which returns a message that we can use to append additional message
-to our current message.
-* on the Person we've added the phoneNumber field and updated the accessor to it.
-* We'll be using payload enricher to populate the phone number there.
-* In the above the message is dropped to the inputChannel, delivers to enricher, enricher to requestChannel,
-service activator associated with CustomerService and get back message containing the string phone number as the payload.
-we instruct the spring integration to take the string phone number payload and assign it to the phoneNumber field of the
-Person entity. After enriching the payload is then put into the outputChannel and goes to PrintService which later gets
-printed onto the console.
+* Processing endpoints that connects the messaging system to application code, external systems and services
+************************************************************************************************************
+* This achieved using endpoints such as service-activator, gateway, and channel Adapters.
+* Aside endpoints that perform filtering, routing and enriching. These endpoints perform the heavy lifting of
+enabling integrations between internal components and external systems.
+* Endpoints discussed in this chapter are crucial for performing integrations between systems and this would not
+be possible without them.
 -->
