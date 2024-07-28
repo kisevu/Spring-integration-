@@ -11,12 +11,8 @@
                  default-request-channel="inputChannel" />
     <int:channel id="inputChannel" />
     <int:channel id="outputChannel" />
-    <int:channel id="agChannel" />
 
-    <bean id="customSplitter" class="com.ameda.kevin.integration_spring.CustomSplitter"/>
-    <int:splitter ref="customSplitter" input-channel="inputChannel" output-channel="agChannel" method="split" />
-    <int:aggregator ref="customAggregator" input-channel="agChannel" output-channel="outputChannel"/>
-    <bean id="customAggregator" class="com.ameda.kevin.integration_spring.CustomAggregator"/>
+    <int:transformer expression="payload.toUpperCase()" input-channel="inputChannel" output-channel="outputChannel"/>
 
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
@@ -24,8 +20,12 @@
 </beans>
 
 <!--
-* Custom Aggregator endpoint
+* Transformer endpoints
 **************************
-* Consolidate several messages into a message group and creates a single message from that group
-* Sometimes we need a custom format of how messages are received
+* we modify either the headers or payload when doing transformations.
+* transformers allows loose coupling between endpoints because we can adjust a message types to satisfy a
+consuming endpoint
+* i.e. if we had an endpoint processing only Json data, however, a producer sends objects. Transformer can be
+used to perform transformation from objects to json data
+* Transformers are used for standardizing data and passing them downstream
 -->
