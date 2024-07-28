@@ -11,30 +11,20 @@
                  default-request-channel="inputChannel" />
     <int:channel id="inputChannel" />
     <int:channel id="outputChannel" />
-    <int:channel id="filterChannel" />
-    <int:channel id="enricherChannel" />
-    <int:channel id="requestChannel" />
 
 
-    <int:service-activator ref="customService" input-channel="requestChannel" method="getPhoneNumber"/>
-    <int:enricher input-channel="inputChannel" request-channel="requestChannel" output-channel="enricherChannel">
-        <int:property name="phoneNumber" expression="payload"/>
-    </int:enricher>
-    <int:header-filter header-names="privateKey" input-channel="enricherChannel" output-channel="filterChannel" />
-    <int:object-to-json-transformer input-channel="filterChannel" output-channel="outputChannel"/>
 
-    <bean id="customService" class="com.ameda.kevin.integration_spring.CustomService"/>
-   <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
+    <int:service-activator ref="upperCaseService" method="execute" input-channel="inputChannel" />
+    <bean id="upperCaseService" class="com.ameda.kevin.integration_spring.UpperCaseService" />
 
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
+    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
 </beans>
 
 <!--
-* Processing endpoints that connects the messaging system to application code, external systems and services
-************************************************************************************************************
-* This achieved using endpoints such as service-activator, gateway, and channel Adapters.
-* Aside endpoints that perform filtering, routing and enriching. These endpoints perform the heavy lifting of
-enabling integrations between internal components and external systems.
-* Endpoints discussed in this chapter are crucial for performing integrations between systems and this would not
-be possible without them.
+* Service Activator endpoint
+*****************************
+* How to have a return value from an endpoint
+* Instead of defining the replyChannel explicitly here, it has been done on the main class on the headers.
+* The result after uppercasing, they have been sent to the output channel
 -->

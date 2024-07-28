@@ -26,15 +26,13 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		Person [] payloads = {new Person("kevin", "ameda"),
-				new Person("kevin","ameda")
-				,new Person("kevin","ameda")};
-		for(int x = 0; x<payloads.length; x++){
-			Message<?> message = MessageBuilder
-					.withPayload(payloads[x])
-					.setHeader("privateKey","12345")
-					.build();
-			this.gateway.print(message);
-		}
+	 Person [] payloads = {new Person("kevin","ameda"),new Person("judith","mongare")};
+	 for(int x =0; x<payloads.length; x++){
+		 Message<?> message = MessageBuilder
+				 .withPayload(payloads[x])
+				 .setHeader("replyChannel","outputChannel")
+				 .build();
+		 this.gateway.print(message);
+	 }
 	}
 }
