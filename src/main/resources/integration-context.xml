@@ -15,10 +15,12 @@
     <int:channel id="enricherChannel" />
 
     <int:header-enricher input-channel="inputChannel" output-channel="enricherChannel">
-        <int:header name="publicKey" value="54321"> </int:header>
+        <int:header name="publicKey" ref="customEnricher" method="getHeaderValue"> </int:header>
     </int:header-enricher>
     <int:header-filter header-names="privateKey" input-channel="enricherChannel" output-channel="outputChannel" />
     <int:object-to-json-transformer input-channel="filterChannel" output-channel="outputChannel"/>
+
+    <bean id="customEnricher" class="com.ameda.kevin.integration_spring.CustomEnricher" />
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
@@ -30,7 +32,8 @@
 * Allows us to add static header to a message
 * We can add   static header to a message using a Custom transformer but the header enricher is a more awesome way to
  do so.
-*
+* We can delegate the value to a different bean in spring IoC container.
+i.e.  as done with CustomEnricher
 
 
 -->
