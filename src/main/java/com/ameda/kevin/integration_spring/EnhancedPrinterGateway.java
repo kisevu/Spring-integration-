@@ -7,8 +7,10 @@ package com.ameda.kevin.integration_spring;
 *
 */
 
+import org.springframework.util.concurrent.ListenableFuture;
+
+
 public interface EnhancedPrinterGateway {
-        //accepting a pojo
-    void print(Person person);
-    String uppercase(Person person);
+    public void print(Person person);
+    public ListenableFuture<String> uppercase(Person person); //allows working with callbacks
 }

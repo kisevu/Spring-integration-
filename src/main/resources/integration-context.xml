@@ -27,8 +27,12 @@
 </beans>
 
 <!--
-* Gateway headers
+* Asynchronous Gateways
 *****************************
-*  Setting headers on the messages that the gateway delivers to the messaging system.
+* Gateways have a way of returning a reply message when we invoke a method.
+* Reply messages can come from different sources some of which may require some processing time.
+* if we inspect the execution of a gateway method  we will discover the gateway will block execution when waiting
+on a reply message. But we would desire to make it async.
+* Spring integration provides us with a way to switch to async behavior.
 
 -->
