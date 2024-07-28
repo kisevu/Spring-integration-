@@ -7,35 +7,25 @@
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
 
+    <int:channel id="registerChannel" />
 
-
-    <int:channel id="printChannel" />
-    <int:channel id="upperCaseChannel" />
-
-     <int:inbound-channel-adapter ref="personDirectoryService" method="findNewPeople" channel="printChannel">
+     <int:inbound-channel-adapter ref="personDirectoryService" method="findNewPeople" channel="registerChannel">
          <int:poller fixed-rate="3000" />
      </int:inbound-channel-adapter>
 
+    <int:outbound-channel-adapter channel="registerChannel" method="registerEmail" ref="personRegistrationService">
+
+    </int:outbound-channel-adapter>
+
     <bean id="personDirectoryService" class="com.ameda.kevin.integration_spring.PersonDirectoryService" />
 
-    <int:service-activator ref="upperCaseService" method="execute" input-channel="upperCaseChannel" />
-    <bean id="upperCaseService" class="com.ameda.kevin.integration_spring.UpperCaseService" />
-
-   <int:service-activator ref="printService" method="print" input-channel="printChannel"/>
-    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
+    <bean id="personRegistrationService" class="com.ameda.kevin.integration_spring.PersonRegistrationService"/>
 </beans>
 
 <!--
-* Inbound channel Adapter
+* Outbound channel Adapter
 *****************************
-* An inbound channel adapter receives messages by pulling  an external system or by being notified by an
- external system.
- * When the message is received is delivered to messaging system to be sent down stream in the message flow.
- The inbound adapter helps integrate with those external systems that need to deliver messages to our application via
- the messaging system.
- * Inbound channel adapter allows external systems implement a variety of technologies.  This external systems
- can interact with our application because spring integration performs the necessary translations of the external's
- message to one suited for our messaging system.
- * Inbound channel adapter can pull or can be event-driven.
- * in our case we have made the inbound channel adapter to be a puller and not an event-driven
+* Does the opposite of the inbound channel adapter.
+* Outbound channel adapters sends messages out from the messaging system.
+
 -->
