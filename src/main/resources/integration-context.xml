@@ -7,8 +7,10 @@
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
 
-    <int:gateway service-interface="com.ameda.kevin.integration_spring.EnhancedPrinterGateway"
-                 default-request-channel="printChannel" />
+    <int:gateway service-interface="com.ameda.kevin.integration_spring.EnhancedPrinterGateway">
+        <int:method name="print" request-channel="printChannel"/>
+        <int:method name="uppercase" request-channel="upperCaseChannel"/>
+    </int:gateway>
 
     <int:channel id="printChannel" />
     <int:channel id="upperCaseChannel" />
@@ -34,5 +36,8 @@ coupling between the spring integration and our application codes.
   * in the background Spring integration builds up a proxy and that is what gets injected into our class,
   when we autowire for EnhancePrinterGateway type. So we invoke methods on the interface the proxy receives them and
   tires them to the messaging system.
-
+* explicitly mapped the methods to the channels in the gateway.
+* we have the a method returning a string which is paired to the UpperCaseService class which has a method execute returning
+a string
+* I've achieved having the gateway with multiple methods and loosely coupled.
 -->
