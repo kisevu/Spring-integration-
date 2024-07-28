@@ -10,6 +10,9 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @SpringBootApplication
 @Configuration
@@ -20,15 +23,30 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 	private PrinterGateway gateway;
 
 
+
 	public static void main(String[] args) {
 		SpringApplication.run(IntegrationSpringApplication.class, args);
 	}
 
 	@Override
 	public void run(ApplicationArguments args) {
-		for(int x = 0; x < 10;x++){
-			Message<String> message = MessageBuilder
-					.withPayload("Printing message payload for: "+ x).build();
+		List<Employee> employees = new ArrayList<>();
+		employees.add(new Employee(1,"kevin",1500.00));
+		employees.add(new Employee(2,"oscar",2000.00));
+		employees.add(new Employee(1,"judith",1000.00));
+
+
+		for(int x = 0; x< employees.size();++x){
+			Employee employee = employees.get(x);
+			Message<?> message = MessageBuilder
+					.withPayload(employee)
+					.build();
+			this.gateway.print(message);
+		}
+		for(int x = 0; x<employees.size(); x++){
+			Message<?> message = MessageBuilder
+					.withPayload(x)
+					.build();
 			this.gateway.print(message);
 		}
 	}

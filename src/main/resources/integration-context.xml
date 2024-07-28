@@ -2,44 +2,33 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/integration
-                           http://www.springframework.org/schema/integration/spring-integration.xsd
-                           http://www.springframework.org/schema/task
-                           http://www.springframework.org/schema/task/spring-task.xsd">
-
-    <task:executor id="executor" pool-size="5" />
-
-    <int:channel id="pollableChannel">
-        <int:queue capacity="10" />
-        <int:interceptors>
-            <int:ref bean="interceptor"/>
-        </int:interceptors>
-    </int:channel>
-
-    <int:publish-subscribe-channel id="inputChannel" task-executor="executor"/>
+                           http://www.springframework.org/schema/integration/spring-integration.xsd">
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
-                 default-request-channel="pollableChannel"/>
+                 default-request-channel="inputChannel" />
 
-    <int:bridge input-channel="pollableChannel" output-channel="inputChannel">
-        <int:poller fixed-delay="5" time-unit="SECONDS" max-messages-per-poll="2">
-        </int:poller>
-    </int:bridge>
+    <int:channel id="inputChannel" />
 
-    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
-    <bean id="upperCasePrintService" class="com.ameda.kevin.integration_spring.UpperCasePrintService" />
+    <int:payload-type-router input-channel="inputChannel" >
+        <int:mapping type="java.lang.Integer" channel="intChannel" />
+        <int:mapping type="java.lang.String" channel="stringChannel"/>
+        <int:mapping type="com.ameda.kevin.integration_spring.Employee" channel="objChannel"/>
+    </int:payload-type-router>
 
-    <bean id="interceptor" class="com.ameda.kevin.integration_spring.CustomChannelInterceptor" />
+    <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
+    <bean class="com.ameda.kevin.integration_spring.NumericPrintService" id="numericPrintService"/>
+    <bean class="com.ameda.kevin.integration_spring.ObjectPrintService" id="objectPrintService"/>
 
-    <int:service-activator ref="upperCasePrintService" method="print" input-channel="inputChannel"/>
-    <int:service-activator ref="printService" method="print" input-channel="inputChannel"/>
+    <int:service-activator ref="printService" method="print" input-channel="stringChannel"/>
+    <int:service-activator ref="numericPrintService" method="print" input-channel="intChannel"/>
+    <int:service-activator ref="objectPrintService" method="print" input-channel="objChannel"/>
 </beans>
 
 <!--
-* Spring integration provides the ChannelInterceptor bean that is used to respond
-when messages are sent or received from a channel.
-* When an interceptor is used in a channel then it means that we have a hook into the messaging architecture which
-can bear benefits. The benefits can be logging, or message modifications at a global level
- -->
+* printer gateway serves the input channel
+* the payload-type-router fetches the messages from the input channel
+* mapping of the type to the intended channel is also done to accomplish the mapping for the type
+* hence the Payload Type Router
+-->
