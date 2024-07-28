@@ -2,30 +2,35 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/integration
-                           http://www.springframework.org/schema/integration/spring-integration.xsd">
+       xmlns:int-file="http://www.springframework.org/schema/integration/file"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration
+           https://www.springframework.org/schema/integration/spring-integration.xsd
+           http://www.springframework.org/schema/integration/file
+           http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
 
-    <int:channel id="registerChannel" />
 
-     <int:inbound-channel-adapter ref="personDirectoryService" method="findNewPeople" channel="registerChannel">
-         <int:poller fixed-rate="3000" />
-     </int:inbound-channel-adapter>
+    <int-file:inbound-channel-adapter directory="file:src/test" channel="inboundChannel" filename-pattern="sample.txt">
+        <int:poller fixed-rate="10000"/>
+    </int-file:inbound-channel-adapter>
+    <int:channel id="inboundChannel"/>
 
-    <int:outbound-channel-adapter channel="registerChannel" method="registerEmail" ref="personRegistrationService">
-
-    </int:outbound-channel-adapter>
-
-    <bean id="personDirectoryService" class="com.ameda.kevin.integration_spring.PersonDirectoryService" />
-
-    <bean id="personRegistrationService" class="com.ameda.kevin.integration_spring.PersonRegistrationService"/>
+    <bean id="filePrinter" class="com.ameda.kevin.integration_spring.FilePrinter"/>
+    <int:service-activator ref="filePrinter" input-channel="inboundChannel"> </int:service-activator>
 </beans>
 
-<!--
-* Outbound channel Adapter
-*****************************
-* Does the opposite of the inbound channel adapter.
-* Outbound channel adapters sends messages out from the messaging system.
 
+<!--
+* File system integrations
+*****************************
+* Exploration of external systems integrations. Focusing on systems outside our application.
+* So far all the workings of the other chapters included internal message exchanges with spring integrations.
+* Here we're going to use endpoints such as Gateways and Adapters to reach beyond our applications.
+*  We can use spring integration to perform integrations with external systems such as JMS, RDBMS,FTP servers and other
+systems.
+* File namespace provides various message endpoints
+a) Reading files File system integrations... (We'll use the Inbound channel adapter within file namespace in
+spring integration)
 -->
