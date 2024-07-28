@@ -10,20 +10,21 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
+  <bean id="customFilter" class="com.ameda.kevin.integration_spring.CustomFilter"/>
+
   <int:channel id="inputChannel" />
   <int:channel id="outputChannel" />
 
-  <int:filter expression="payload.equals(4)" input-channel="inputChannel" output-channel="outputChannel" />
+  <int:filter ref="customFilter" input-channel="inputChannel" output-channel="outputChannel" />
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
 </beans>
 
 <!--
-* Filters
+* Custom Filters to handle advanced filtering
 **************************
-* Filters are endpoints that decide whether a message should be passed or should be dropped.
-* In spring security we have a use of the filter
-* The underlying logic of the filters can be configured in several ways
-* expression attribute is consulted whether the message should be dropped or proceed to the output
+*  Created by implementing the MessageSelectorType
+* MessageSelectorType helps in creating custom logic that can be integrated into and consulted by the Messaging service
+ when filtering.
 -->
