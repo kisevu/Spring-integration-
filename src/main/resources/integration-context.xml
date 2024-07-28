@@ -8,7 +8,10 @@
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <int:gateway service-interface="com.ameda.kevin.integration_spring.EnhancedPrinterGateway">
-        <int:method name="print" request-channel="printChannel"/>
+        <int:default-header name="globalHeader" value="simpleValue"/>
+        <int:method name="print" request-channel="printChannel">
+        <int:header name="individualHeader" expression="#args[0].firstName"/>
+        </int:method>
         <int:method name="uppercase" request-channel="upperCaseChannel"/>
     </int:gateway>
 
@@ -24,20 +27,8 @@
 </beans>
 
 <!--
-* Gateways
+* Gateway headers
 *****************************
-* Gateways are used withing the spring integration to hide the messaging system.
-* Gateways helps remove direct dependencies of spring integration components to our codes.
-* To do the hiding we use the interfaces to accomplish the behavior which reduces tight
-coupling between the spring integration and our application codes.
-* By having such  void print(Message<?> message); and using the Message from spring integration imposes a tight
-    coupling nature which is not greatly encouraged as loose coupling is the goal.
- * So with the EnhancedPrinterGateway where is the messaging system impl?
-  * in the background Spring integration builds up a proxy and that is what gets injected into our class,
-  when we autowire for EnhancePrinterGateway type. So we invoke methods on the interface the proxy receives them and
-  tires them to the messaging system.
-* explicitly mapped the methods to the channels in the gateway.
-* we have the a method returning a string which is paired to the UpperCaseService class which has a method execute returning
-a string
-* I've achieved having the gateway with multiple methods and loosely coupled.
+*  Setting headers on the messages that the gateway delivers to the messaging system.
+
 -->

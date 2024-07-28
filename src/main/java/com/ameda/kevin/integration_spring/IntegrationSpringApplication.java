@@ -26,8 +26,7 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 	 Person [] payloads = {new Person("kevin","ameda"),new Person("judith","mongare")};
 	 for(int x =0; x<payloads.length; x++){
-		String returnMessage = this.gateway.uppercase(payloads[x]);
-		 System.out.println(returnMessage); //only message no headers
+		 this.gateway.print(payloads[x]);
 	 }
 	}
 }
