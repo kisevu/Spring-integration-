@@ -28,9 +28,9 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		for(int x = 0; x<10; x++){
+		for(int x = 0; x<2; x++){
 			Message<?> message = MessageBuilder
-					.withPayload(x)
+					.withPayload("kevin ameda kisevu")
 					.build();
 			this.gateway.print(message);
 		}

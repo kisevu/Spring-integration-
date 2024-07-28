@@ -10,21 +10,24 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
-  <bean id="customFilter" class="com.ameda.kevin.integration_spring.CustomFilter"/>
+    <bean id="customSplitter" class="com.ameda.kevin.integration_spring.CustomSplitter"/>
+    <int:splitter ref="customSplitter" input-channel="inputChannel" output-channel="outputChannel" />
 
   <int:channel id="inputChannel" />
   <int:channel id="outputChannel" />
 
-  <int:filter ref="customFilter" input-channel="inputChannel" output-channel="outputChannel" />
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
 </beans>
 
 <!--
-* Custom Filters to handle advanced filtering
+* Splitter endpoint
 **************************
-*  Created by implementing the MessageSelectorType
-* MessageSelectorType helps in creating custom logic that can be integrated into and consulted by the Messaging service
- when filtering.
+*  Used to separate a message into multiple parts.
+* Resulting parts are send separately.
+* When we want to split a message in the CustomSplitter we must return one of three types;
+* Collection/Array of messages
+* Collection/ Array of non messages.
+* A message / a non message object.
 -->
