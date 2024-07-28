@@ -7,17 +7,16 @@
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
 
-    <int:gateway service-interface="com.ameda.kevin.integration_spring.EnhancedPrinterGateway">
-        <int:default-header name="globalHeader" value="simpleValue"/>
-        <int:method name="print" request-channel="printChannel">
-        <int:header name="individualHeader" expression="#args[0].firstName"/>
-        </int:method>
-        <int:method name="uppercase" request-channel="upperCaseChannel"/>
-    </int:gateway>
+
 
     <int:channel id="printChannel" />
     <int:channel id="upperCaseChannel" />
 
+     <int:inbound-channel-adapter ref="personDirectoryService" method="findNewPeople" channel="printChannel">
+         <int:poller fixed-rate="3000" />
+     </int:inbound-channel-adapter>
+
+    <bean id="personDirectoryService" class="com.ameda.kevin.integration_spring.PersonDirectoryService" />
 
     <int:service-activator ref="upperCaseService" method="execute" input-channel="upperCaseChannel" />
     <bean id="upperCaseService" class="com.ameda.kevin.integration_spring.UpperCaseService" />
@@ -27,12 +26,16 @@
 </beans>
 
 <!--
-* Asynchronous Gateways
+* Inbound channel Adapter
 *****************************
-* Gateways have a way of returning a reply message when we invoke a method.
-* Reply messages can come from different sources some of which may require some processing time.
-* if we inspect the execution of a gateway method  we will discover the gateway will block execution when waiting
-on a reply message. But we would desire to make it async.
-* Spring integration provides us with a way to switch to async behavior.
-
+* An inbound channel adapter receives messages by pulling  an external system or by being notified by an
+ external system.
+ * When the message is received is delivered to messaging system to be sent down stream in the message flow.
+ The inbound adapter helps integrate with those external systems that need to deliver messages to our application via
+ the messaging system.
+ * Inbound channel adapter allows external systems implement a variety of technologies.  This external systems
+ can interact with our application because spring integration performs the necessary translations of the external's
+ message to one suited for our messaging system.
+ * Inbound channel adapter can pull or can be event-driven.
+ * in our case we have made the inbound channel adapter to be a puller and not an event-driven
 -->
