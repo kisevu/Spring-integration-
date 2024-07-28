@@ -11,7 +11,7 @@
                  default-request-channel="inputChannel" />
 
     <bean id="customSplitter" class="com.ameda.kevin.integration_spring.CustomSplitter"/>
-    <int:splitter ref="customSplitter" input-channel="inputChannel" output-channel="outputChannel" />
+    <int:splitter ref="customSplitter" input-channel="inputChannel" output-channel="outputChannel" method="split" />
 
   <int:channel id="inputChannel" />
   <int:channel id="outputChannel" />
