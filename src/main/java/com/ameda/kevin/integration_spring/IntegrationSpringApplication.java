@@ -40,14 +40,15 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 			Employee employee = employees.get(x);
 			Message<?> message = MessageBuilder
 					.withPayload(employee)
+					.setHeader("routeHeader","objChannel")
 					.build();
 			this.gateway.print(message);
 		}
-		for(int x = 0; x<employees.size(); x++){
-			Message<?> message = MessageBuilder
-					.withPayload(x)
-					.build();
-			this.gateway.print(message);
-		}
+//		for(int x = 0; x<employees.size(); x++){
+//			Message<?> message = MessageBuilder
+//					.withPayload(x)
+//					.build();
+//			this.gateway.print(message);
+//		}
 	}
 }

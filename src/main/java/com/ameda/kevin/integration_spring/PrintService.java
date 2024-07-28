@@ -9,8 +9,8 @@ package com.ameda.kevin.integration_spring;
 import org.springframework.messaging.Message;
 public class PrintService {
 
-    public void print(Message<String>message){
-        System.out.println(message.getPayload());
+    public void print(Message<?>message){
+        System.out.println("String printing "+message.getPayload());
     }
 
 }

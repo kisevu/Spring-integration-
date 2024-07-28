@@ -9,13 +9,8 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
+    <int:header-value-router input-channel="inputChannel" header-name="routeHeader"> </int:header-value-router>
     <int:channel id="inputChannel" />
-
-    <int:payload-type-router input-channel="inputChannel" >
-        <int:mapping type="java.lang.Integer" channel="intChannel" />
-        <int:mapping type="java.lang.String" channel="stringChannel"/>
-        <int:mapping type="com.ameda.kevin.integration_spring.Employee" channel="objChannel"/>
-    </int:payload-type-router>
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
     <bean class="com.ameda.kevin.integration_spring.NumericPrintService" id="numericPrintService"/>
@@ -27,8 +22,12 @@
 </beans>
 
 <!--
-* printer gateway serves the input channel
-* the payload-type-router fetches the messages from the input channel
-* mapping of the type to the intended channel is also done to accomplish the mapping for the type
-* hence the Payload Type Router
+* Header Value Type Router
+**************************
+* When we need to send a message to a channel based on the header value condition we use the Header value typer router
+* We use the Header Value router namespace
+* We also include the input channel as an attribute to the router and provide same channel from the gateway
+* provider a header-name attribute which is very useful.
+
+
 -->
