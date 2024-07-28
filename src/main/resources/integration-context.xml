@@ -15,8 +15,8 @@
 
     <bean id="customSplitter" class="com.ameda.kevin.integration_spring.CustomSplitter"/>
     <int:splitter ref="customSplitter" input-channel="inputChannel" output-channel="agChannel" method="split" />
-    <int:aggregator input-channel="agChannel" output-channel="outputChannel"/>
-
+    <int:aggregator ref="customAggregator" input-channel="agChannel" output-channel="outputChannel"/>
+    <bean id="customAggregator" class="com.ameda.kevin.integration_spring.CustomAggregator"/>
 
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
@@ -24,8 +24,8 @@
 </beans>
 
 <!--
-* Aggregator endpoint
+* Custom Aggregator endpoint
 **************************
 * Consolidate several messages into a message group and creates a single message from that group
-
+* Sometimes we need a custom format of how messages are received
 -->
