@@ -6,26 +6,24 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/integration
                            http://www.springframework.org/schema/integration/spring-integration.xsd">
+
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
-  <bean class="com.ameda.kevin.integration_spring.CustomRouter" id="customRouter"/>
-  <int:router ref="customRouter" input-channel="inputChannel" default-output-channel="intChannel" />
+  <int:channel id="inputChannel" />
+  <int:channel id="outputChannel" />
 
-    <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
-    <bean class="com.ameda.kevin.integration_spring.NumericPrintService" id="numericPrintService"/>
-    <bean class="com.ameda.kevin.integration_spring.ObjectPrintService" id="objectPrintService"/>
-    <bean class="com.ameda.kevin.integration_spring.DefaultService" id="defaultService"/>
+  <int:filter expression="payload.equals(4)" input-channel="inputChannel" output-channel="outputChannel" />
 
-    <int:service-activator ref="printService" method="print" input-channel="stringChannel"/>
-    <int:service-activator ref="numericPrintService" method="print" input-channel="intChannel"/>
-    <int:service-activator ref="objectPrintService" method="print" input-channel="objChannel"/>
-    <int:service-activator ref="defaultService" method="print" input-channel="defaultChannel"/>
+   <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
+   <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
 </beans>
 
 <!--
-* Custom message Router
+* Filters
 **************************
-* Creating a custom message router and connecting it to the spring messaging architecture
-* CustomRouter class is defined and the logic placed into it to handle the custom nature of working
+* Filters are endpoints that decide whether a message should be passed or should be dropped.
+* In spring security we have a use of the filter
+* The underlying logic of the filters can be configured in several ways
+* expression attribute is consulted whether the message should be dropped or proceed to the output
 -->
