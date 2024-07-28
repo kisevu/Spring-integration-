@@ -10,8 +10,6 @@ import org.springframework.messaging.Message;
 
 import java.util.Map;
 
-
-
 public class PrintService {
 
     public void print(Message<?>message){
