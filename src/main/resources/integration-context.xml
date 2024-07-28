@@ -12,25 +12,30 @@
            http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
 
 
-    <int-file:inbound-channel-adapter directory="file:src/test" channel="inboundChannel" filename-pattern="sample.txt">
+    <int-file:inbound-channel-adapter
+            directory="file:src/test/read"
+            channel="inboundChannel"
+            filename-pattern="sample.txt">
+
         <int:poller fixed-rate="10000"/>
     </int-file:inbound-channel-adapter>
+
     <int:channel id="inboundChannel"/>
 
-    <bean id="filePrinter" class="com.ameda.kevin.integration_spring.FilePrinter"/>
-    <int:service-activator ref="filePrinter" input-channel="inboundChannel"> </int:service-activator>
+    <int-file:outbound-channel-adapter
+            directory="file:src/test/write"
+            channel="inboundChannel"
+            auto-create-directory="true"
+            mode="REPLACE"
+            delete-source-files="true">
+    </int-file:outbound-channel-adapter>
 </beans>
 
-
 <!--
-* File system integrations
-*****************************
-* Exploration of external systems integrations. Focusing on systems outside our application.
-* So far all the workings of the other chapters included internal message exchanges with spring integrations.
-* Here we're going to use endpoints such as Gateways and Adapters to reach beyond our applications.
-*  We can use spring integration to perform integrations with external systems such as JMS, RDBMS,FTP servers and other
-systems.
-* File namespace provides various message endpoints
-a) Reading files File system integrations... (We'll use the Inbound channel adapter within file namespace in
-spring integration)
+* Writing files to the file system using spring integration outbound channel adapter
+************************************************************************************
+* namespace provides a convenient approach to using file writing message handler to write to file system.
+* When working with the int-file outbound-channel adapter, it accepts messages that have a payload of type;
+a) file b)bytearray c) string
+* in our place we'll be working with the file for our example at the top
 -->
