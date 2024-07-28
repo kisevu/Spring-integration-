@@ -9,25 +9,31 @@
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PrinterGateway"
                  default-request-channel="inputChannel" />
 
-    <int:header-value-router input-channel="inputChannel" header-name="routeHeader"> </int:header-value-router>
-    <int:channel id="inputChannel" />
+    <int:recipient-list-router input-channel="inputChannel" default-output-channel="defaultChannel">
+        <int:recipient selector-expression="payload.id == 1" channel="intChannel" />
+        <int:recipient selector-expression="payload.id == 2" channel="stringChannel" />
+        <int:recipient selector-expression="payload.id == 3" channel="objChannel" />
+    </int:recipient-list-router>
+
 
     <bean class="com.ameda.kevin.integration_spring.PrintService" id="printService"/>
     <bean class="com.ameda.kevin.integration_spring.NumericPrintService" id="numericPrintService"/>
     <bean class="com.ameda.kevin.integration_spring.ObjectPrintService" id="objectPrintService"/>
+    <bean class="com.ameda.kevin.integration_spring.DefaultService" id="defaultService"/>
 
     <int:service-activator ref="printService" method="print" input-channel="stringChannel"/>
     <int:service-activator ref="numericPrintService" method="print" input-channel="intChannel"/>
     <int:service-activator ref="objectPrintService" method="print" input-channel="objChannel"/>
+    <int:service-activator ref="defaultService" method="print" input-channel="defaultChannel"/>
 </beans>
 
 <!--
-* Header Value Type Router
+* Recipient List Router
 **************************
-* When we need to send a message to a channel based on the header value condition we use the Header value typer router
-* We use the Header Value router namespace
-* We also include the input channel as an attribute to the router and provide same channel from the gateway
-* provider a header-name attribute which is very useful.
-
-
+* Allows to statically define a list of message channels that should receive a message passed to the router
+* At least all the channels received the message
+* We have an attribute selector-expression="payload.equals(Employee{id=1, name='judith', salary=1000.0})" and
+ specify to which channel it should be routed to
+* I've set a default channel in case the selection-expression doesn't match to any channel
+*
 -->
