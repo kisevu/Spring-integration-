@@ -11,17 +11,21 @@
                  default-request-channel="inputChannel" />
     <int:channel id="inputChannel" />
     <int:channel id="outputChannel" />
+    <int:channel id="filterChannel" />
 
-
-    <int:object-to-json-transformer input-channel="inputChannel" output-channel="outputChannel"/>
+    <int:header-filter header-names="privateKey" input-channel="inputChannel" output-channel="outputChannel" />
+    <int:object-to-json-transformer input-channel="filterChannel" output-channel="outputChannel"/>
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
 </beans>
 
 <!--
-* Transformer types
+* Another way we can transform a message is through the header filter
 **************************
-* Spring integration provides us with custom transformations out of the box
-* Earlier on we've been working with simple payloads, well payloads can contain some complex types i.e Employee class
+*  if there's a header that should not be passed down stream, the header filter can remove it.
+* This includes the security which should not be cascaded down stream.
+* working with the header filter we need having the header field to our message
+* We have the header called privateKey which we wouldn't want to be passed downstream
+
 -->

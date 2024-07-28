@@ -32,6 +32,7 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 		for(int x = 0; x<payloads.length; x++){
 			Message<?> message = MessageBuilder
 					.withPayload(payloads[x])
+					.setHeader("privateKey","12345")
 					.build();
 			this.gateway.print(message);
 		}
