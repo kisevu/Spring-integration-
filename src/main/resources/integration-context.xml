@@ -12,23 +12,16 @@
     <int:channel id="inputChannel" />
     <int:channel id="outputChannel" />
 
-    <bean id="CustomTransformer" class="com.ameda.kevin.integration_spring.CustomTransformer"/>
 
-    <int:transformer ref="CustomTransformer" method="transform" input-channel="inputChannel" output-channel="outputChannel"/>
-
+    <int:object-to-string-transformer input-channel="inputChannel" output-channel="outputChannel"/>
 
    <bean id="printService" class="com.ameda.kevin.integration_spring.PrintService" />
    <int:service-activator ref="printService" method="print" input-channel="outputChannel"/>
 </beans>
 
 <!--
-* Transformer endpoints
+* Transformer types
 **************************
-* we modify either the headers or payload when doing transformations.
-* transformers allows loose coupling between endpoints because we can adjust a message types to satisfy a
-consuming endpoint
-* i.e. if we had an endpoint processing only Json data, however, a producer sends objects. Transformer can be
-used to perform transformation from objects to json data
-* Transformers are used for standardizing data and passing them downstream
-*custom logic of transformation
+* Spring integration provides us with custom transformations out of the box
+* Earlier on we've been working with simple payloads, well payloads can contain some complex types i.e Employee class
 -->
