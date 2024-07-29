@@ -37,12 +37,9 @@
 </beans>
 
 <!--
-* Outbound File Gateway
+* Integration with FTP a)
 *******************************************************
-*  Unlike adapters being a one-way communicate, gateway have a two-way capability, in the sense they can get a request
-and a response.
-* We'll look at the outbound file gateway within the file namespace.
-* This component is used to a write a file based upon a received message and then pass the message to another channel for
-continued  processing.
-
+*  FTP allows for transfer of files between a client and server through an established connection.
+*  ftp namespace should be used to establish a set of endpoints tha connects our messaging systems and applications
+to ftp resources.
 -->
