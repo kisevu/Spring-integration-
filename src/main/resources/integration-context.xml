@@ -14,21 +14,30 @@
                 http://www.springframework.org/schema/integration/jdbc
                 https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
 
+
+    <int:gateway service-interface="com.ameda.kevin.integration_spring.PersonGateway"
+                 default-request-channel="inboundChannel">
+
+    </int:gateway>
+
+    <int-jdbc:outbound-channel-adapter
+            channel="inboundChannel"
+            data-source="datasource" query="insert into person values(:payload.id, :payload.firstName, :payload.lastName)">
+    </int-jdbc:outbound-channel-adapter>
+
     <int:channel id="jdbcChannel"/>
-<jdbc:embedded-database id="datasource" type="H2">
-    <jdbc:script location="init.sql"/>
-</jdbc:embedded-database>
-    <int-jdbc:inbound-channel-adapter channel="jdbcChannel"
-                                      query="select * from person"
-                                      data-source="datasource">
-        <int:poller fixed-rate="4000"> </int:poller>
-    </int-jdbc:inbound-channel-adapter>
+    <int:channel id="inboundChannel"/>
+    <!-- below is a datasource bean which does the heavy lifting -->
+    <jdbc:embedded-database id="datasource" type="H2">
+        <jdbc:script location="init.sql"/>
+    </jdbc:embedded-database>
+
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
     <int:service-activator ref="printerService" method="print"  input-channel="jdbcChannel"/>
 </beans>
 
 <!--
-* Integration with jdbc) Inbound Channel Adapter
+* Integration with jdbc) Outbound Channel Adapter
 *******************************************************
 * Integration of relational databases via jdbc.
 * Direct jdbc connection from one application to another is not an uncommon thing.
@@ -41,5 +50,6 @@ ResultSet returned by the query.
 The List will contain a Map that corresponds with each row returned in the set.
 * Inbound channel adapter will execute our query against the database, and the ResultSet becomes the payload of the
   message and that message gets placed on the jdbc channel.
-
+* Outbound channel Adapter inserts messages into a relational database based upon a message it receives.
+* The query above uses the bean property expression to write records.
 -->

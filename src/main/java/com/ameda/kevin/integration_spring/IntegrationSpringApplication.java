@@ -1,5 +1,6 @@
 package com.ameda.kevin.integration_spring;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,6 +12,8 @@ import org.springframework.context.annotation.ImportResource;
 @Configuration
 @ImportResource("integration-context.xml")
 public class IntegrationSpringApplication implements ApplicationRunner {
+	@Autowired
+	private PersonGateway gateway;
 
 	public static void main(String[] args) {
 		SpringApplication.run(IntegrationSpringApplication.class, args);
@@ -18,6 +21,8 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-
+		Person person = new Person(4,"Judith","Mongare");
+		gateway.save(person);
+		//person is the new payload to the message system
 	}
 }
