@@ -2,22 +2,33 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           https://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/integration
-           https://www.springframework.org/schema/integration/spring-integration.xsd
-           http://www.springframework.org/schema/jdbc
-           http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+                http://www.springframework.org/schema/beans
+                https://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/integration
+                https://www.springframework.org/schema/integration/spring-integration.xsd
+                http://www.springframework.org/schema/jdbc
+                https://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+                http://www.springframework.org/schema/integration/jdbc
+                https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
+
     <int:channel id="jdbcChannel"/>
 <jdbc:embedded-database id="datasource" type="H2">
     <jdbc:script location="init.sql"/>
 </jdbc:embedded-database>
+    <int-jdbc:inbound-channel-adapter channel="jdbcChannel"
+                                      query="select * from person"
+                                      data-source="datasource">
+        <int:poller fixed-rate="4000"> </int:poller>
+    </int-jdbc:inbound-channel-adapter>
+    <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
+    <int:service-activator ref="printerService" method="print"  input-channel="jdbcChannel"/>
 </beans>
 
 <!--
-* Integration with jdbc)
+* Integration with jdbc) Inbound Channel Adapter
 *******************************************************
 * Integration of relational databases via jdbc.
 * Direct jdbc connection from one application to another is not an uncommon thing.
@@ -25,4 +36,10 @@
 * We'll use jdbc Inbound/ Outbound Channel Adapters, which allows us to read and write records to a relational
  database with jdbc. We'll see how the message system passes messages
 * We'll look at the jdbc outbound Gateway which provides us with capabilities to receive or send messages.
+* Inbound channel Adapter does execute SQL query against our database and return a list that corresponds with the
+ResultSet returned by the query.
+The List will contain a Map that corresponds with each row returned in the set.
+* Inbound channel adapter will execute our query against the database, and the ResultSet becomes the payload of the
+  message and that message gets placed on the jdbc channel.
+
 -->

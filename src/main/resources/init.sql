@@ -5,3 +5,4 @@ create table person(
 );
 
 insert into person values(1,'kevin','ameda');
+insert into person values(2,'oscar','kisala');
