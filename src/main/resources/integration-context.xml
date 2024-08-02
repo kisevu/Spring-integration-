@@ -2,44 +2,27 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:int-file="http://www.springframework.org/schema/integration/file"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="
            http://www.springframework.org/schema/beans
            https://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/integration
            https://www.springframework.org/schema/integration/spring-integration.xsd
-           http://www.springframework.org/schema/integration/file
-           http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
-
-
-    <int-file:inbound-channel-adapter
-            directory="file:src/test/read"
-            channel="inboundChannel"
-            filename-pattern="sample.txt">
-
-        <int:poller fixed-rate="10000" time-unit="SECONDS"/>
-    </int-file:inbound-channel-adapter>
-
-    <int:channel id="inboundChannel"/>
-    <int:channel id="transformChannel"/>
-    <int:channel id="outboundChannel"/>
-
-    <int-file:outbound-gateway request-channel="transformChannel" reply-channel="outboundChannel"
-                               directory="file:src/test/write" auto-create-directory="true" mode="REPLACE">
-
-    </int-file:outbound-gateway>
-
-    <int-file:file-to-string-transformer input-channel="inboundChannel" output-channel="transformChannel"/>
-    <bean id="filePrinter" class="com.ameda.kevin.integration_spring.FilePrinter"/>
-    <int:service-activator ref="filePrinter" input-channel="outboundChannel" method="print"/>
-
-
+           http://www.springframework.org/schema/jdbc
+           http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+    <int:channel id="jdbcChannel"/>
+<jdbc:embedded-database id="datasource" type="H2">
+    <jdbc:script location="init.sql"/>
+</jdbc:embedded-database>
 </beans>
 
 <!--
-* Integration with FTP a)
+* Integration with jdbc)
 *******************************************************
-*  FTP allows for transfer of files between a client and server through an established connection.
-*  ftp namespace should be used to establish a set of endpoints tha connects our messaging systems and applications
-to ftp resources.
+* Integration of relational databases via jdbc.
+* Direct jdbc connection from one application to another is not an uncommon thing.
+* Spring integration helps us to abstract this communication using the spring integration jdbc integration support.
+* We'll use jdbc Inbound/ Outbound Channel Adapters, which allows us to read and write records to a relational
+ database with jdbc. We'll see how the message system passes messages
+* We'll look at the jdbc outbound Gateway which provides us with capabilities to receive or send messages.
 -->

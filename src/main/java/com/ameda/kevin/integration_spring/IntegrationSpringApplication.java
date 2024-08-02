@@ -18,6 +18,6 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		//here we are going to be pulling messages from inbound channel adapter
+
 	}
 }
