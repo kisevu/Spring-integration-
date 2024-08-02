@@ -13,10 +13,10 @@ import java.util.Map;
 public class PrintService {
 
     public void print(Message<?>message){
-
-        for(Map.Entry<String,Object> entry: message.getHeaders().entrySet()){
-            System.out.println("GenericMessage: "+message.getPayload()+", headers={"+entry+"}");
-        }
+//        for(Map.Entry<String,Object> entry: message.getHeaders().entrySet()){
+//            System.out.println("GenericMessage: "+message.getPayload()+", headers={"+entry+"}");
+//        }
+        System.out.println("Generic Message: "+message.getPayload()+"headers: "+message.getHeaders());
     }
 
 }

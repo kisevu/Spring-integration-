@@ -17,16 +17,23 @@
 
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PersonGateway"
                  default-request-channel="inboundChannel">
-
     </int:gateway>
+    <!-- We can change the message that gets sends out of the outbound gateway
+    by providing a query attribute, and the query gets executed after the query in the update
+    attribute
+     -->
 
-    <int-jdbc:outbound-channel-adapter
-            channel="inboundChannel"
-            data-source="datasource" query="insert into person values(:payload.id, :payload.firstName, :payload.lastName)">
-    </int-jdbc:outbound-channel-adapter>
+    <int-jdbc:outbound-gateway
+            request-channel="inboundChannel"
+            data-source="datasource"
+            update="insert into person values(:payload.id, :payload.firstName, :payload.lastName)"
+            query="select * from person where person_id=:payload.id"
+            reply-channel="jdbcChannel">
+    </int-jdbc:outbound-gateway>
 
     <int:channel id="jdbcChannel"/>
     <int:channel id="inboundChannel"/>
+
     <!-- below is a datasource bean which does the heavy lifting -->
     <jdbc:embedded-database id="datasource" type="H2">
         <jdbc:script location="init.sql"/>
@@ -37,7 +44,7 @@
 </beans>
 
 <!--
-* Integration with jdbc) Outbound Channel Adapter
+* Integration with jdbc) JDBC Outbound Gateway
 *******************************************************
 * Integration of relational databases via jdbc.
 * Direct jdbc connection from one application to another is not an uncommon thing.
@@ -52,4 +59,7 @@ The List will contain a Map that corresponds with each row returned in the set.
   message and that message gets placed on the jdbc channel.
 * Outbound channel Adapter inserts messages into a relational database based upon a message it receives.
 * The query above uses the bean property expression to write records.
+* JDBC Outbound gateway can be used both to perform write and read operations against a jdbc data store.
+* The component receives a message which is then written to the database much like the Outbound channel adapter.
+In the case of the gateway, a message is then passed to a reply channel
 -->
