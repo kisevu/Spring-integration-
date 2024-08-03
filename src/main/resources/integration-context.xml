@@ -2,64 +2,65 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
-       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
        xsi:schemaLocation="
-                http://www.springframework.org/schema/beans
-                https://www.springframework.org/schema/beans/spring-beans.xsd
-                http://www.springframework.org/schema/integration
-                https://www.springframework.org/schema/integration/spring-integration.xsd
-                http://www.springframework.org/schema/jdbc
-                https://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-                http://www.springframework.org/schema/integration/jdbc
-                https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
+           http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration
+           https://www.springframework.org/schema/integration/spring-integration.xsd
+           http://www.springframework.org/schema/integration/jms
+           https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
 
+     <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+         <property name="targetConnectionFactory">
+             <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                 <property name="brokerURL" value="tcp://localhost:61616"/>
+             </bean>
+         </property>
+     </bean>
+    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="sample.queue"> </constructor-arg>
+    </bean>
+    <int-jms:outbound-channel-adapter
+            connection-factory="connectionFactory"
+            channel="outboundChannel"
+            destination="queue"/>
+
+    <int:object-to-string-transformer
+            input-channel="inboundChannel"
+            output-channel="outboundChannel">
+    </int:object-to-string-transformer>
 
     <int:gateway service-interface="com.ameda.kevin.integration_spring.PersonGateway"
                  default-request-channel="inboundChannel">
     </int:gateway>
-    <!-- We can change the message that gets sends out of the outbound gateway
-    by providing a query attribute, and the query gets executed after the query in the update
-    attribute
-     -->
 
-    <int-jdbc:outbound-gateway
-            request-channel="inboundChannel"
-            data-source="datasource"
-            update="insert into person values(:payload.id, :payload.firstName, :payload.lastName)"
-            query="select * from person where person_id=:payload.id"
-            reply-channel="jdbcChannel">
-    </int-jdbc:outbound-gateway>
 
-    <int:channel id="jdbcChannel"/>
+    <int:channel id="jmsChannel"/>
     <int:channel id="inboundChannel"/>
+    <int:channel id="outboundChannel"/>
 
-    <!-- below is a datasource bean which does the heavy lifting -->
-    <jdbc:embedded-database id="datasource" type="H2">
-        <jdbc:script location="init.sql"/>
-    </jdbc:embedded-database>
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
-    <int:service-activator ref="printerService" method="print"  input-channel="jdbcChannel"/>
+    <int:service-activator ref="printerService" method="print"  input-channel="jmsChannel"/>
 </beans>
 
 <!--
-* Integration with jdbc) JDBC Outbound Gateway
+* Integration with JMS (Java Message Service) JMS Outbound Channel Adapter
 *******************************************************
-* Integration of relational databases via jdbc.
-* Direct jdbc connection from one application to another is not an uncommon thing.
-* Spring integration helps us to abstract this communication using the spring integration jdbc integration support.
-* We'll use jdbc Inbound/ Outbound Channel Adapters, which allows us to read and write records to a relational
- database with jdbc. We'll see how the message system passes messages
-* We'll look at the jdbc outbound Gateway which provides us with capabilities to receive or send messages.
-* Inbound channel Adapter does execute SQL query against our database and return a list that corresponds with the
-ResultSet returned by the query.
-The List will contain a Map that corresponds with each row returned in the set.
-* Inbound channel adapter will execute our query against the database, and the ResultSet becomes the payload of the
-  message and that message gets placed on the jdbc channel.
-* Outbound channel Adapter inserts messages into a relational database based upon a message it receives.
-* The query above uses the bean property expression to write records.
-* JDBC Outbound gateway can be used both to perform write and read operations against a jdbc data store.
-* The component receives a message which is then written to the database much like the Outbound channel adapter.
-In the case of the gateway, a message is then passed to a reply channel
+*  JMS is an API that detects how applications communicate.
+*  The API contains a list of interfaces which a java application can use to create, send, receive or read
+messages.
+* JMS provides for loose coupling between systems and creates reliable transport between the nodes.
+* JMS Channel adapters are used to communicate with activemq server.
+* JMS Outbound channel Adapter to send a message to jms server
+Process of how everything is working
+********************************************
+* In Main application, we are invoking the save method on the gateway passing in a Person.
+In xml-config, I've set up a gateway to accept the person object by making it the payload of the message
+and sending it to the inbound channel.Inbound channel is connected to "object-to_string transformer" which will
+in turn invoke the toString on person object.This is then made to be the payload which is entirely sent to the outboundchannel.
+My outbound channel is then connected to the Outbound channel Adapter.
+The Outbound channel Adapter then sends the message to destination which is the queue. The connection to the queue is
+seamless because we have a configuration in place which tells it how to connect.
 -->

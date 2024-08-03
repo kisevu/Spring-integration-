@@ -1,0 +1,23 @@
+services:
+  activemq:
+    image: webcenter/activemq:latest
+    container_name: activemq
+    ports:
+      - "61616:61616" # OpenWire protocol
+      - "61613:61613" # STOMP protocol
+      - "7800:5672"   # AMQP protocol
+      - "1883:1883"   # MQTT protocol
+      - "8161:8161"   # Web console
+    environment:
+      - ACTIVEMQ_ADMIN_LOGIN=admin
+      - ACTIVEMQ_ADMIN_PASSWORD=admin
+    volumes:
+      - activemq-data:/opt/activemq/data
+    networks:
+      - activemq-network
+
+volumes:
+  activemq-data:
+
+networks:
+  activemq-network:

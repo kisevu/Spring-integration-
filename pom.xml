@@ -18,10 +18,23 @@
 		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
-		<!-- Spring Boot Integration Starter (includes core integration support) -->
+		<!-- Spring Boot Starter Integration (includes core integration support) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Starter ActiveMQ (includes ActiveMQ support) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-activemq</artifactId>
+		</dependency>
+
+		<!-- Spring Integration JMS support -->
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jms</artifactId>
+			<version>5.4.6</version>
 		</dependency>
 
 		<!-- Jackson Databind for JSON processing -->
@@ -34,13 +47,14 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-file</artifactId>
+			<version>5.4.6</version>
 		</dependency>
 
 		<!-- H2 Database -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.200</version> <!-- Adjusted version compatible with Spring Boot 2.4.5 -->
+			<version>1.4.200</version>
 		</dependency>
 
 		<!-- Spring Boot Starter Test (for testing) -->
@@ -56,11 +70,11 @@
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
 
-		<!-- Spring Integration JDBC (compatible version with Spring Boot 2.4.5) -->
+		<!-- Spring Integration JDBC -->
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-jdbc</artifactId>
-			<version>5.4.6</version> <!-- Adjusted version compatible with Spring Boot 2.4.5 -->
+			<version>5.4.6</version>
 		</dependency>
 
 		<!-- Spring Integration Test support -->
