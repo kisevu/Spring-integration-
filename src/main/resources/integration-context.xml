@@ -11,27 +11,27 @@
            http://www.springframework.org/schema/integration/http
            https://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-    <int-http:inbound-channel-adapter
-            path="/"
+    <int-http:inbound-gateway
+            request-channel="httpChannel"
             supported-methods="GET"
-            channel="httpChannel">
-    </int-http:inbound-channel-adapter>
+            path="/">
+    </int-http:inbound-gateway>
+
     
     <int:channel id="httpChannel"/>
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
-    <int:service-activator ref="printerService" input-channel="httpChannel" method="printConsole">
+    <int:service-activator ref="printerService" input-channel="httpChannel" method="print">
     </int:service-activator>
 
 </beans>
 <!--
-* Http Integration support (HTTP Inbound Channel Adapter)
+* Http Integration support (HTTP Inbound Gateway)
 *******************************************************
-* Provides a number of Adapters and Gateways that allow our applications to integrate with REST APIS
-Most of the APIs use http as the underlying protocol.
-* Http Inbound channel Adapter provides one-way communication for inbound http traffic
-* It allows our spring integration applications to receive http requests which are then converted to messages
-that are passed downstream for further processing.
+* Http Inbound Gateway much similar like the http inbound.
+ What it does is, it takes in the http request and pass it as a message downstream for further processing within
+ spring integration messaging system. The gateway allows for two-way communication.
+ A response is sent back to whatever system sent the http request to our application
 *********************************************
 *
 -->
