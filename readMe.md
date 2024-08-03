@@ -23,8 +23,8 @@
 - [Kevin Ameda Kisevu](https://github.com/kisevu) - Initial work
 
 
-![HTTP Inbound Channel Adapter](https://github.com/kisevu/Spring-integration-/blob/jms-integrations/src/main/resources/static/HTTP Inbound Channel Adapter.JPG)
+
+![HTTP Inbound Channel Adapter](https://github.com/kisevu/Spring-integration-/blob/jms-integrations/src/main/resources/static/HTTP_Inbound_Channel_Adapter.JPG)
 # Prerequisite
 * The application is powered with docker which is used to run the activemq container
 * use docker-compose.yml file provided
-
