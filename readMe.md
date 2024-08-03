@@ -23,7 +23,8 @@
 - [Kevin Ameda Kisevu](https://github.com/kisevu) - Initial work
 
 
-![read messages off the queue with jms](https://github.com/kisevu/Spring-integration-/blob/jms-integrations/src/main/resources/static/reply-message-sent-to-reply-queue.JPG)
+![HTTP Inbound Channel Adapter](https://github.com/kisevu/Spring-integration-/blob/jms-integrations/src/main/resources/static/HTTP Inbound Channel Adapter.JPG)
 # Prerequisite
 * The application is powered with docker which is used to run the activemq container
 * use docker-compose.yml file provided
+

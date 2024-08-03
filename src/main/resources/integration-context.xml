@@ -2,82 +2,37 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xsi:schemaLocation="
            http://www.springframework.org/schema/beans
            https://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/integration
            https://www.springframework.org/schema/integration/spring-integration.xsd
-           http://www.springframework.org/schema/integration/jms
-           https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
+           http://www.springframework.org/schema/integration/http
+           https://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-    <!-- Inbound Gateway checks queue for messages to process and pass them to service activator-->
-    <int-jms:inbound-gateway
-            connection-factory="connectionFactory"
-            request-channel="jmsChannel"
-            request-destination="queue"
-            default-reply-destination="replyQueue"/>
-
-    <int-jms:outbound-gateway
-            connection-factory="connectionFactory"
-            request-destination="queue"
-            request-channel="outboundChannel"
-            reply-destination="replyQueue"
-            reply-channel="replyChannel"/>
-
-    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <property name="targetConnectionFactory">
-            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                <property name="brokerURL" value="tcp://localhost:61616"/>
-            </bean>
-        </property>
-    </bean>
-
-    <int:object-to-string-transformer
-            input-channel="inboundChannel"
-            output-channel="outboundChannel">
-    </int:object-to-string-transformer>
-
-    <int:gateway service-interface="com.ameda.kevin.integration_spring.PersonGateway"
-                 default-request-channel="inboundChannel">
-    </int:gateway>
-
-
-    <int:channel id="jmsChannel"/>
-    <int:channel id="inboundChannel"/>
-    <int:channel id="outboundChannel"/>
-    <int:channel id="replyChannel"/>
-
-    <bean id="replyQueue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="reply.queue"> </constructor-arg>
-    </bean>
-    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="sample.queue"> </constructor-arg>
-    </bean>
-
+    <int-http:inbound-channel-adapter
+            path="/"
+            supported-methods="GET"
+            channel="httpChannel">
+    </int-http:inbound-channel-adapter>
+    
+    <int:channel id="httpChannel"/>
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
+    <int:service-activator ref="printerService" input-channel="httpChannel" method="printConsole">
+    </int:service-activator>
 
-    <int:service-activator ref="printerService" method="print"  input-channel="jmsChannel"/>
-    <int:service-activator ref="printerService" method="printConsole"  input-channel="replyChannel"/>
 </beans>
-
 <!--
-* Integration with JMS (Java Message Service) JMS Outbound Gateway
+* Http Integration support (HTTP Inbound Channel Adapter)
 *******************************************************
-* There are gateways provided in jms integrations.
-* JMS Outbound Gateway is used to send a message from the spring jms application to a JMS queue.
-* Once the message is placed upon a queue, another entity works the message and places a response on a replyQueue
-from which the outbound gateway receives the message.
-Once the Outbound Gateway receives the message it passes it to spring integration messaging system for further processing.
-Process
+* Provides a number of Adapters and Gateways that allow our applications to integrate with REST APIS
+Most of the APIs use http as the underlying protocol.
+* Http Inbound channel Adapter provides one-way communication for inbound http traffic
+* It allows our spring integration applications to receive http requests which are then converted to messages
+that are passed downstream for further processing.
 *********************************************
-* In main class the save method is invoked by the gateway.Person object is passed to inboundChannel as payload.
-* It goes to the "object-to-string" transformer
-* That message from transformer is passed to the Outbound Gateway
-* The message is passed to the queue (sample.queue) on activeMQ server.
-* Upon receiving the message,activeMQ server notifies the Inbound Gateway which receives the message and passes it to the
-jmsChannel. JmsChannel drops the message with PrinterService bean which then invokes the print() message to replyQueue of the
-Outbound Gateway(monitors the replyQueue). The message is delivered to the replyChannel which connected to another service
-activator that invokes the printConsole() Which prints the message.
+*
 -->
+

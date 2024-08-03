@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: integration-spring
+
+server:
+  port: 8888
+#  servlet:
+#    context-path: /
+#logging.level.root=debug
+#
+#server.servlet.context-path=

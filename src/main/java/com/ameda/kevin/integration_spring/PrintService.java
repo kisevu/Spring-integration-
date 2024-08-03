@@ -15,7 +15,7 @@ public class PrintService {
     }
 
     public void printConsole(Message<?>message){
-        System.out.println("Message was passed to printConsole from the Outbound Gateway");
+        System.out.println("Message was passed to printConsole.");
         System.out.println(message);
     }
 }
