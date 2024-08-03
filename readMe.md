@@ -1,17 +1,22 @@
 # Spring Integration JMS integration
-## JMS Message Driven Channel Adapter
-
-
-* Integration with JMS (Java Message Service) JMS Inbound Gateway
+* Integration with JMS (Java Message Service) JMS Outbound Gateway
 *******************************************************
 * There are gateways provided in jms integrations.
-* JMS Inbound Gateway is used to receive messages from a JMS server and provide a response to the received message.
-* So in the gateway, we are going to receive our message from our jms server/activemq server. And works somewhat like a
-  Message Driven channel Adapter. (The message is going to be pushed to us.)
-* We'll be receiving the message via the push from the server using the Inbound Gateway. The gateway is going to put
-  that message to a channel. Once the message is put in the channel, it is going to be delivered to an endpoint where some
-  processing is to occur and a message can be sent back.
-* A little change for the PrinterService to return a message
+* JMS Outbound Gateway is used to send a message from the spring jms application to a JMS queue.
+* Once the message is placed upon a queue, another entity works the message and places a response on a replyQueue
+  from which the outbound gateway receives the message.
+  Once the Outbound Gateway receives the message it passes it to spring integration messaging system for further processing.
+  Process
+*********************************************
+* In main class the save method is invoked by the gateway.Person object is passed to inboundChannel as payload.
+* It goes to the "object-to-string" transformer
+* That message from transformer is passed to the Outbound Gateway
+* The message is passed to the queue (sample.queue) on activeMQ server.
+* Upon receiving the message,activeMQ server notifies the Inbound Gateway which receives the message and passes it to the
+  jmsChannel. JmsChannel drops the message with PrinterService bean which then invokes the print() message to replyQueue of the
+  Outbound Gateway(monitors the replyQueue). The message is delivered to the replyChannel which connected to another service
+  activator that invokes the printConsole() Which prints the message.
+
 
 ## Author
 

@@ -23,6 +23,5 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		Person person = new Person(4,"kevin","kisevu");
 		this.gateway.save(person);
-		System.out.println("The message has been sent to JMS...");
 	}
 }

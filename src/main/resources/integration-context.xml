@@ -11,33 +11,27 @@
            http://www.springframework.org/schema/integration/jms
            https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
 
+    <!-- Inbound Gateway checks queue for messages to process and pass them to service activator-->
     <int-jms:inbound-gateway
             connection-factory="connectionFactory"
             request-channel="jmsChannel"
             request-destination="queue"
             default-reply-destination="replyQueue"/>
 
-     <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-         <property name="targetConnectionFactory">
-             <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                 <property name="brokerURL" value="tcp://localhost:61616"/>
-             </bean>
-         </property>
-     </bean>
-
-    <bean id="replyQueue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="reply.queue"> </constructor-arg>
-    </bean>
-
-    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="sample.queue"> </constructor-arg>
-    </bean>
-
-    <int-jms:outbound-channel-adapter
+    <int-jms:outbound-gateway
             connection-factory="connectionFactory"
-            channel="outboundChannel"
-            destination="queue"/>
+            request-destination="queue"
+            request-channel="outboundChannel"
+            reply-destination="replyQueue"
+            reply-channel="replyChannel"/>
 
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </bean>
+        </property>
+    </bean>
 
     <int:object-to-string-transformer
             input-channel="inboundChannel"
@@ -52,21 +46,38 @@
     <int:channel id="jmsChannel"/>
     <int:channel id="inboundChannel"/>
     <int:channel id="outboundChannel"/>
+    <int:channel id="replyChannel"/>
+
+    <bean id="replyQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="reply.queue"> </constructor-arg>
+    </bean>
+    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="sample.queue"> </constructor-arg>
+    </bean>
 
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
+
     <int:service-activator ref="printerService" method="print"  input-channel="jmsChannel"/>
+    <int:service-activator ref="printerService" method="printConsole"  input-channel="replyChannel"/>
 </beans>
 
 <!--
-* Integration with JMS (Java Message Service) JMS Inbound Gateway
+* Integration with JMS (Java Message Service) JMS Outbound Gateway
 *******************************************************
 * There are gateways provided in jms integrations.
-* JMS Inbound Gateway is used to receive messages from a JMS server and provide a response to the received message.
-* So in the gateway, we are going to receive our message from our jms server/activemq server. And works somewhat like a
-Message Driven channel Adapter. (The message is going to be pushed to us.)
-* We'll be receiving the message via the push from the server using the Inbound Gateway. The gateway is going to put
-that message to a channel. Once the message is put in the channel, it is going to be delivered to an endpoint where some
-processing is to occur and a message can be sent back.
-* A little change for the PrinterService to return a message
+* JMS Outbound Gateway is used to send a message from the spring jms application to a JMS queue.
+* Once the message is placed upon a queue, another entity works the message and places a response on a replyQueue
+from which the outbound gateway receives the message.
+Once the Outbound Gateway receives the message it passes it to spring integration messaging system for further processing.
+Process
+*********************************************
+* In main class the save method is invoked by the gateway.Person object is passed to inboundChannel as payload.
+* It goes to the "object-to-string" transformer
+* That message from transformer is passed to the Outbound Gateway
+* The message is passed to the queue (sample.queue) on activeMQ server.
+* Upon receiving the message,activeMQ server notifies the Inbound Gateway which receives the message and passes it to the
+jmsChannel. JmsChannel drops the message with PrinterService bean which then invokes the print() message to replyQueue of the
+Outbound Gateway(monitors the replyQueue). The message is delivered to the replyChannel which connected to another service
+activator that invokes the printConsole() Which prints the message.
 -->
