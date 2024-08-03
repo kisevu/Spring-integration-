@@ -11,6 +11,12 @@
            http://www.springframework.org/schema/integration/jms
            https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
 
+    <int-jms:inbound-gateway
+            connection-factory="connectionFactory"
+            request-channel="jmsChannel"
+            request-destination="queue"
+            default-reply-destination="replyQueue"/>
+
      <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
          <property name="targetConnectionFactory">
              <bean class="org.apache.activemq.ActiveMQConnectionFactory">
@@ -18,18 +24,20 @@
              </bean>
          </property>
      </bean>
+
+    <bean id="replyQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="reply.queue"> </constructor-arg>
+    </bean>
+
     <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
         <constructor-arg value="sample.queue"> </constructor-arg>
     </bean>
+
     <int-jms:outbound-channel-adapter
             connection-factory="connectionFactory"
             channel="outboundChannel"
             destination="queue"/>
 
-    <int-jms:message-driven-channel-adapter
-            connection-factory="connectionFactory"
-            destination="queue"
-            channel="jmsChannel" />
 
     <int:object-to-string-transformer
             input-channel="inboundChannel"
@@ -51,11 +59,14 @@
 </beans>
 
 <!--
-* Integration with JMS (Java Message Service) JMS Message Driven Channel Adapter
+* Integration with JMS (Java Message Service) JMS Inbound Gateway
 *******************************************************
-* This includes another way in which we can receive messages off of our JMS queue.
-* We saw JMS Inbound channel Adapter was used,but by polling, it used 7000ms to check whether there's a message in the queue.
-Typically, my application initiating a request to check if a message exists in the server.
-Another approach is the server notifying us when a message is available.
-* When using a Message-Driven Channel Adapter, we get to see the use of notifications to whether a message is on the queue.
+* There are gateways provided in jms integrations.
+* JMS Inbound Gateway is used to receive messages from a JMS server and provide a response to the received message.
+* So in the gateway, we are going to receive our message from our jms server/activemq server. And works somewhat like a
+Message Driven channel Adapter. (The message is going to be pushed to us.)
+* We'll be receiving the message via the push from the server using the Inbound Gateway. The gateway is going to put
+that message to a channel. Once the message is put in the channel, it is going to be delivered to an endpoint where some
+processing is to occur and a message can be sent back.
+* A little change for the PrinterService to return a message
 -->
