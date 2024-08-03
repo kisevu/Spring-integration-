@@ -14,7 +14,7 @@ seamless because we have a configuration in place which tells it how to connect.
 - [Kevin Ameda Kisevu](https://github.com/kisevu) - Initial work
 
 
-![messages on activemq queue](resource/static/messages.JPG)
+![messages on activemq queue](https://github.com/kisevu/Spring-integration-/blob/jms-integrations/src/main/resources/static/messages.JPG)
 # Prerequisite
 * The application is powered with docker which is used to run the activemq container
 * use docker-compose.yml file provided
