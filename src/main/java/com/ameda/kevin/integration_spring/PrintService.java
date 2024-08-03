@@ -8,15 +8,11 @@ package com.ameda.kevin.integration_spring;
 
 import org.springframework.messaging.Message;
 
-import java.util.Map;
-
 public class PrintService {
 
     public void print(Message<?>message){
-//        for(Map.Entry<String,Object> entry: message.getHeaders().entrySet()){
-//            System.out.println("GenericMessage: "+message.getPayload()+", headers={"+entry+"}");
-//        }
-        System.out.println("Generic Message: "+message.getPayload()+"headers: "+message.getHeaders());
+        System.out.println("Printing the message:");
+        System.out.println(message);
     }
 
 }

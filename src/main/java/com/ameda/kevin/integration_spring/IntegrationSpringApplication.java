@@ -21,8 +21,8 @@ public class IntegrationSpringApplication implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		Person person = new Person(4,"kevin","ameda");
+		Person person = new Person(4,"kevin","kisevu");
 		this.gateway.save(person);
-		//person is the new payload to the message system
+		System.out.println("The message has been sent to JMS...");
 	}
 }
