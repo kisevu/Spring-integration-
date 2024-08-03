@@ -11,27 +11,39 @@
            http://www.springframework.org/schema/integration/http
            https://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-    <int-http:inbound-gateway
-            request-channel="httpChannel"
-            supported-methods="GET"
-            path="/">
-    </int-http:inbound-gateway>
 
-    
+    <int-http:outbound-channel-adapter
+            channel="httpOutboundChannel"
+            http-method="GET"
+            url="http://localhost:8888/">
+    </int-http:outbound-channel-adapter>
+
+<int-http:inbound-gateway request-channel="httpChannel" supported-methods="GET" path="/"/>
+
     <int:channel id="httpChannel"/>
+    <int:channel id="httpOutboundChannel"/>
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
-    <int:service-activator ref="printerService" input-channel="httpChannel" method="print">
+
+    <int:service-activator
+            ref="printerService"
+            input-channel="httpChannel"
+            method="print">
     </int:service-activator>
+
+    <int:gateway service-interface="com.ameda.kevin.integration_spring.SimpleGateway"
+                 default-request-channel="httpOutboundChannel"/>
 
 </beans>
 <!--
-* Http Integration support (HTTP Inbound Gateway)
+* Http Integration support (HTTP Outbound Channel Adapter)
 *******************************************************
-* Http Inbound Gateway much similar like the http inbound.
- What it does is, it takes in the http request and pass it as a message downstream for further processing within
- spring integration messaging system. The gateway allows for two-way communication.
- A response is sent back to whatever system sent the http request to our application
+* Allows us to send http requests from spring integration application based upon messages received
+from the messaging system.
+The component provides one way communication with http, Here we do not receive any replies
+other than some status code like 200
+* This is an outbound component and in order to interact with it, we'd require to send messages
+to it and for this will be using the gateway
 *********************************************
 *
 -->
