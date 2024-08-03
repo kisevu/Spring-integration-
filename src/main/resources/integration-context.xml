@@ -11,19 +11,27 @@
            http://www.springframework.org/schema/integration/http
            https://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
 
-
-    <int-http:outbound-channel-adapter
-            channel="httpOutboundChannel"
+    <int-http:outbound-gateway
+            request-channel="httpOutboundChannel"
+            url="http://localhost:8888/"
             http-method="GET"
-            url="http://localhost:8888/">
-    </int-http:outbound-channel-adapter>
+            reply-channel="httpReplyChannel">
+    </int-http:outbound-gateway>
 
 <int-http:inbound-gateway request-channel="httpChannel" supported-methods="GET" path="/"/>
 
     <int:channel id="httpChannel"/>
     <int:channel id="httpOutboundChannel"/>
+    <int:channel id="httpReplyChannel"/>
 
     <bean id="printerService" class="com.ameda.kevin.integration_spring.PrintService"/>
+    <bean id="printerService2" class="com.ameda.kevin.integration_spring.PrintService"/>
+
+    <int:service-activator
+            ref="printerService2"
+            input-channel="httpReplyChannel"
+            method="printConsole">
+    </int:service-activator>
 
     <int:service-activator
             ref="printerService"
@@ -36,14 +44,10 @@
 
 </beans>
 <!--
-* Http Integration support (HTTP Outbound Channel Adapter)
+* Http Integration support (HTTP Outbound Gateway)
 *******************************************************
-* Allows us to send http requests from spring integration application based upon messages received
-from the messaging system.
-The component provides one way communication with http, Here we do not receive any replies
-other than some status code like 200
-* This is an outbound component and in order to interact with it, we'd require to send messages
-to it and for this will be using the gateway
+* Allows us to send http requests from our application similar to http outbound channel adapter with the difference being
+that the gateway allows for the two way communication.
 *********************************************
 *
 -->
