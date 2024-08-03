@@ -1,17 +1,12 @@
 # Spring Integration JMS integration
-## JMS Outbound Channel Adapter
+## JMS Message Driven Channel Adapter
 
 
-JMS Inbound Channel Adapter is used to retrieve messages from a JMS queue by polling the queue
-for any new messages.The new message found is then sent to the JMS system for distribution.
-So the destination is where we are reading the messages and the channel is where the messages read off of the queue will
-be sent. We see the jmsChannel is pretty much bound to the PrinterService which does print the gotten messages. The printing
-is done through the invocation of the toString() method.
-N/B Any time we are receiving messages from a message source such as activemq or jms server, we need to be operating
-in one or two manners:
-- Tha resource is going to push us the message.
-- We're reaching out and pull that resource.
-  (That's the reason we're going to configure a poller property)
+This includes another way in which we can receive messages off of our JMS queue.
+* We saw JMS Inbound channel Adapter was used,but by polling, it used 7000ms to check whether there's a message in the queue.
+  Typically, my application initiating a request to check if a message exists in the server.
+  Another approach is the server notifying us when a message is available.
+* When using a Message-Driven Channel Adapter, we get to see the use of notifications to whether a message is on the queue.
 
 ## Author
 
